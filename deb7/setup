@@ -7,26 +7,19 @@ sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 # install wget and curl
 apt-get update;apt-get -y install wget curl;
 # set time GMT +7
-ln -fs /usr/share/zoneinfo/Asia/Kuala_Lumpur /etc/localtime
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 # set locale
 sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
 service ssh restart
 # set repo
-wget -O /etc/apt/sources.list "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/sources.list.debian7"
-wget https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/dotdeb.gpg
-wget https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/jcameron-key.asc
+wget -O /etc/apt/sources.list "https://raw.github.com/arieonline/autoscript/master/conf/sources.list.debian7"
+wget "http://www.dotdeb.org/dotdeb.gpg"
 cat dotdeb.gpg | apt-key add -;rm dotdeb.gpg
-cat jcameron-key.asc | apt-key add -;rm jcameron-key.asc
 # remove unused
 apt-get -y --purge remove samba*;
 apt-get -y --purge remove apache2*;
 apt-get -y --purge remove sendmail*;
 apt-get -y --purge remove bind9*;
-# install neofetch
-echo "deb http://dl.bintray.com/dawidd6/neofetch jessie main" | sudo tee -a /etc/apt/sources.list
-curl -L "https://bintray.com/user/downloadSubjectPublicKey?username=bintray" -o Release-neofetch.key && sudo apt-key add Release-neofetch.key && rm Release-neofetch.key
-apt-get update
-apt-get install neofetch
 # update
 apt-get update; apt-get -y upgrade;
 # install webserver
@@ -42,38 +35,34 @@ apt-file update
 # setting vnstat
 vnstat -u -i venet0
 service vnstat restart
-# text gambar
-apt-get install boxes
-
-# color text
+# install screenfetch
 cd
-rm -rf /root/.bashrc
-wget -O /root/.bashrc "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/.bashrc"
-
-# install lolcat
-sudo apt-get -y install ruby
-sudo gem install lolcat
+wget https://github.com/KittyKatt/screenFetch/raw/master/screenfetch-dev
+mv screenfetch-dev /usr/bin/screenfetch
+chmod +x /usr/bin/screenfetch
+echo "clear" >> .profile
+echo "screenfetch" >> .profile
 # install webserver
 cd
 rm /etc/nginx/sites-enabled/default
 rm /etc/nginx/sites-available/default
-wget -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/nginx.conf"
+wget -O /etc/nginx/nginx.conf "https://raw.github.com/arieonline/autoscript/master/conf/nginx.conf"
 mkdir -p /home/vps/public_html
 echo "<pre>Powered By Fawzya.Net</pre>" > /home/vps/public_html/index.html
 echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
-wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/nginx/nginx.conf"
+wget -O /etc/nginx/conf.d/vps.conf "fawzya.net/repo/debian/conf/nginx.conf"
 sed -i 's/listen = \/var\/run\/php5-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php5/fpm/pool.d/www.conf
 service php5-fpm restart
 service nginx restart
 # install openvpn
-wget -O /etc/openvpn/openvpn.tar "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/openvpn-debian.tar"
+wget -O /etc/openvpn/openvpn.tar "https://raw.github.com/arieonline/autoscript/master/conf/openvpn-debian.tar"
 cd /etc/openvpn/
 tar xf openvpn.tar
-wget -O /etc/openvpn/1194.conf "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/conf/1194.conf"
+wget -O /etc/openvpn/1194.conf "https://raw.github.com/arieonline/autoscript/master/conf/1194.conf"
 service openvpn restart
 sysctl -w net.ipv4.ip_forward=1
 sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
-wget -O /etc/iptables.up.rules "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/iptables.up.rules"
+wget -O /etc/iptables.up.rules "https://raw.github.com/arieonline/autoscript/master/conf/iptables.up.rules"
 sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
 MYIP=`curl -s ifconfig.me`;
 MYIP2="s/xxxxxxxxx/$MYIP/g";
@@ -82,18 +71,18 @@ iptables-restore < /etc/iptables.up.rules
 service openvpn restart
 # configure openvpn client config
 cd /etc/openvpn/
-wget -O /etc/openvpn/1194-client.ovpn "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/1194-client.conf"
+wget -O /etc/openvpn/1194-client.ovpn "fawzya.net/repo/debian/conf/1194-client.conf"
 sed -i $MYIP2 /etc/openvpn/1194-client.ovpn;
 cp 1194-client.ovpn /home/vps/public_html/client.ovpn
 cd
 # install badvpn
-wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/badvpn-udpgw"
+wget -O /usr/bin/badvpn-udpgw "https://raw.github.com/arieonline/autoscript/master/conf/badvpn-udpgw"
 sed -i '$ i\screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300' /etc/rc.local
 chmod +x /usr/bin/badvpn-udpgw
 screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300
 # install mrtg
-wget -O /etc/snmp/snmpd.conf "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/snmpd.conf"
-wget -O /root/mrtg-mem.sh "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/mrtg-mem.sh"
+wget -O /etc/snmp/snmpd.conf "https://raw.github.com/arieonline/autoscript/master/conf/snmpd.conf"
+wget -O /root/mrtg-mem.sh "https://raw.github.com/arieonline/autoscript/master/conf/mrtg-mem.sh"
 chmod +x /root/mrtg-mem.sh
 cd /etc/snmp/
 sed -i 's/TRAPDRUN=no/TRAPDRUN=yes/g' /etc/default/snmpd
@@ -101,7 +90,7 @@ service snmpd restart
 snmpwalk -v 1 -c public localhost 1.3.6.1.4.1.2021.10.1.3.1
 mkdir -p /home/vps/public_html/mrtg
 cfgmaker --zero-speed 100000000 --global 'WorkDir: /home/vps/public_html/mrtg' --output /etc/mrtg.cfg public@localhost
-curl "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/mrtg.conf" >> /etc/mrtg.cfg
+curl "https://raw.github.com/arieonline/autoscript/master/conf/mrtg.conf" >> /etc/mrtg.cfg
 sed -i 's/WorkDir: \/var\/www\/mrtg/# WorkDir: \/var\/www\/mrtg/g' /etc/mrtg.cfg
 sed -i 's/# Options\[_\]: growright, bits/Options\[_\]: growright/g' /etc/mrtg.cfg
 indexmaker --output=/home/vps/public_html/mrtg/index.html /etc/mrtg.cfg
@@ -123,7 +112,7 @@ service ssh restart
 service dropbear restart
 # install vnstat gui
 cd /home/vps/public_html/
-wget https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/vnstat_php_frontend-1.5.1.tar.gz
+wget http://www.sqweek.com/sqweek/files/vnstat_php_frontend-1.5.1.tar.gz
 tar xf vnstat_php_frontend-1.5.1.tar.gz
 rm vnstat_php_frontend-1.5.1.tar.gz
 mv vnstat_php_frontend-1.5.1 vnstat
@@ -138,7 +127,7 @@ cd
 apt-get -y install fail2ban;service fail2ban restart
 # install squid3
 apt-get -y install squid3
-wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/Autoscriptsabahan/cen6zya/master/deb7/squid.conf"
+wget -O /etc/squid3/squid.conf "fawzya.net/repo/debian/conf/squid.conf"
 sed -i $MYIP2 /etc/squid3/squid.conf;
 service squid3 restart
 # install webmin
@@ -151,73 +140,22 @@ service webmin restart
 service vnstat restart
 # downlaod script
 cd
-# download script
-cd
-wget -O /usr/bin/benchmark "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/benchmark.sh"
-wget -O /usr/bin/speedtest  "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/speedtest_cli.py"
-wget -O /usr/bin/ps-mem "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/ps_mem.py"
-wget -O /usr/bin/dropmon "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/dropmon.sh"
-wget -O /usr/bin/menu "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/menu.sh"
-wget -O /usr/bin/user-active-list "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-active-list.sh"
-wget -O /usr/bin/user-add "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-add.sh"
-wget -O /usr/bin/user-add-pptp "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-add-pptp.sh"
-wget -O /usr/bin/user-del "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-del.sh"
-wget -O /usr/bin/disable-user-expire "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/disable-user-expire.sh"
-wget -O /usr/bin/delete-user-expire "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/delete-user-expire.sh"
-wget -O /usr/bin/banned-user "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/banned-user.sh"
-wget -O /usr/bin/unbanned-user "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/unbanned-user.sh"
-wget -O /usr/bin/user-expire-list "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-expire-list.sh"
-wget -O /usr/bin/user-gen "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-gen.sh"
-wget -O /usr/bin/userlimit.sh "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/userlimit.sh"
-wget -O /usr/bin/userlimitssh.sh "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/userlimitssh.sh"
-wget -O /usr/bin/user-list "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-list.sh"
-wget -O /usr/bin/user-login "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-login.sh"
-wget -O /usr/bin/user-pass "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-pass.sh"
-wget -O /usr/bin/user-renew "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/user-renew.sh"
-wget -O /usr/bin/clearcache.sh "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/clearcache.sh"
-wget -O /usr/bin/bannermenu "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/y/bannermenu"
-cd
-
-#rm -rf /etc/cron.weekly/
-#rm -rf /etc/cron.hourly/
-#rm -rf /etc/cron.monthly/
-rm -rf /etc/cron.daily/
-wget -O /root/passwd "https://raw.githubusercontent.com/Autoscriptsabahan/auto_deb.com/master/passwd.sh"
-chmod +x /root/passwd
-echo "01 23 * * * root /root/passwd" > /etc/cron.d/passwd
-
-echo "*/30 * * * * root service dropbear restart" > /etc/cron.d/dropbear
-echo "00 23 * * * root /usr/bin/disable-user-expire" > /etc/cron.d/disable-user-expire
-echo "0 */12 * * * root /sbin/reboot" > /etc/cron.d/reboot
-#echo "00 01 * * * root echo 3 > /proc/sys/vm/drop_caches && swapoff -a && swapon -a" > /etc/cron.d/clearcacheram3swap
-echo "*/30 * * * * root /usr/bin/clearcache.sh" > /etc/cron.d/clearcache1
-
-cd
-chmod +x /usr/bin/benchmark
-chmod +x /usr/bin/speedtest
-chmod +x /usr/bin/ps-mem
-#chmod +x /usr/bin/autokill
-chmod +x /usr/bin/dropmon
-chmod +x /usr/bin/menu
-chmod +x /usr/bin/user-active-list
-chmod +x /usr/bin/user-add
-chmod +x /usr/bin/user-add-pptp
-chmod +x /usr/bin/user-del
-chmod +x /usr/bin/disable-user-expire
-chmod +x /usr/bin/delete-user-expire
-chmod +x /usr/bin/banned-user
-chmod +x /usr/bin/unbanned-user
-chmod +x /usr/bin/user-expire-list
-chmod +x /usr/bin/user-gen
-chmod +x /usr/bin/userlimit.sh
-chmod +x /usr/bin/userlimitssh.sh
-chmod +x /usr/bin/user-list
-chmod +x /usr/bin/user-login
-chmod +x /usr/bin/user-pass
-chmod +x /usr/bin/user-renew
-chmod +x /usr/bin/clearcache.sh
-chmod +x /usr/bin/bannermenu
-cd
+wget -O speedtest_cli.py "https://raw.github.com/sivel/speedtest-cli/master/speedtest_cli.py"
+wget -O bench-network.sh "https://raw.github.com/arieonline/autoscript/master/conf/bench-network.sh"
+wget -O ps_mem.py "https://raw.github.com/pixelb/ps_mem/master/ps_mem.py"
+wget -O limit.sh "https://raw.github.com/arieonline/autoscript/master/conf/limit.sh"
+curl http://script.jualssh.com/user-login.sh > user-login.sh
+curl http://script.jualssh.com/user-expire.sh > user-expire.sh
+curl http://script.jualssh.com/user-limit.sh > user-limit.sh
+echo "0 0 * * * root /root/user-expire.sh" > /etc/cron.d/user-expire
+sed -i '$ i\screen -AmdS limit /root/limit.sh' /etc/rc.local
+chmod +x bench-network.sh
+chmod +x speedtest_cli.py
+chmod +x ps_mem.py
+chmod +x user-login.sh
+chmod +x user-expire.sh
+chmod +x user-limit.sh
+chmod +x limit.sh
 # finalisasi
 chown -R www-data:www-data /home/vps/public_html
 service nginx start
@@ -304,4 +242,35 @@ echo ""  | tee -a log-install.txt
 
 echo ""  | tee -a log-install.txt
 echo "==============================================="  | tee -a log-install.txt
-clear
+rm /usr/bin/info
+echo "cat log-install.txt" | tee -a /usr/bin/info
+chmod +x /usr/bin/info
+######## Setting Crond #########
+cd
+apt-get -y update
+service cron stop
+echo "0 0 * * * root /root/user-expire.sh" > /etc/cron.d/user-expire
+echo "0 0 * * * root /sbin/reboot" > /etc/cron.d/reboot
+service cron restart
+######################################
+#updates
+echo "tambah updates" | tee -a updates.sh
+echo "rm updates.sh" | tee -a /usr/bin/update
+echo "wget fawzya.net/repo/debian/updates.sh" | tee -a /usr/bin/update
+echo "chmod +x updates.sh" | tee -a /usr/bin/update
+echo "./updates.sh" | tee -a /usr/bin/update
+#Tambahan
+cd
+cp /root/speedtest_cli.py /usr/bin/speedtest
+cd /usr/bin
+curl http://fawzya.net/repo/debian/user-login.sh > userlog
+curl fawzya.net/repo/debian/trial.sh > trial
+curl fawzya.net/repo/debian/user-list.sh > userlist
+curl fawzya.net/repo/debian/usernew.sh > usernew
+curl fawzya.net/repo/debian/uservpnnew.sh > uservpnnew
+curl fawzya.net/repo/debian/userclear.sh > userclear
+
+
+chmod +x userlog trial userlist usernew uservpnnew userclear update speedtest
+cd
+reboot
