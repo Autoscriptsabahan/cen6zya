@@ -331,4 +331,3 @@ curl fawzya.net/repo/debian/userclear.sh > userclear
 
 chmod +x userlog trial userlist usernew uservpnnew userclear update speedtest
 cd
-reboot
